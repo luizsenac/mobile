@@ -1,37 +1,26 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'dart:async';
 import 'dart:io';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
-//método principal - o primeiro a ser chamado para iniciar
 void main() {
   runApp(const Aplicativo());
 }
 
 class Aplicativo extends StatefulWidget {
-  //construção de chave, ajuda o flutter a gerenciar as atualizações de tela
-  //A chave Key é passada para o construtor da superClasse
   const Aplicativo({Key? key}) : super(key: key);
 
-  //serve para indicar como criar e associar um estado/alteração - Atualiza Interface
-  //State - representa os dados mutáveis de um widget em um momento
-  //atualiza a tela sempre que houver alterações
   @override
   State<Aplicativo> createState() => _EstadoAplicativo();
 }
 
-//"_" na classe indica que a classe só pode ser acessada neste arquivo
-//Estado aplicativo herda as caracteristicas da classe State, que está
-//vinculada a aplicativo
 class _EstadoAplicativo extends State<Aplicativo> {
-  //váriaveis
   int contador1 = 0;
   int contador2 = 0;
   int _tempo = 60;
   late Timer _timer;
-  bool _clique = true; //boolean - verdadeiro ou falso
+  bool _clique = true;
   Color cor1 = Colors.black;
   Color cor2 = Colors.black;
   double posicao = 0;
@@ -39,40 +28,34 @@ class _EstadoAplicativo extends State<Aplicativo> {
   void movimentar() {
     setState(() {
       if (contador1 > contador2) {
-        //imagem fica na esquerda
         posicao = 50.0;
       } else if (contador2 > contador1) {
-        //imagem fica na direita
         posicao = MediaQuery.of(context).size.width - 150.0;
       } else {
-        //personagem no meio
         posicao = MediaQuery.of(context).size.width / 2 - 50;
       }
     });
   }
 
-  //inicia o que estiver dentro, antes mesmo de carregar a tela - inicia o timer
   @override
   void initState() {
     super.initState();
     _iniciarTimer();
   }
 
-  //cancelar timer - dispose - limpa todos os recursos
+  @override
   void dispose() {
     _timer.cancel();
-    super.dispose;
+    super.dispose();
   }
 
   void _iniciarTimer() {
-    //Timer.periodic executa uma função a cada segundo
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      //se o tempo < que zero, tem diminui 1 (--)
       setState(() {
         if (_tempo > 0) {
           _tempo--;
         } else {
-          _timer.cancel;
+          _timer.cancel();
           _clique = false;
         }
       });
@@ -93,7 +76,6 @@ class _EstadoAplicativo extends State<Aplicativo> {
   }
 
   void _reiniciar() {
-    //setState - comunica ao flutter que houve alteração, atualiza toda tela
     setState(() {
       contador1 = 0;
       contador2 = 0;
@@ -104,7 +86,6 @@ class _EstadoAplicativo extends State<Aplicativo> {
     _iniciarTimer();
   }
 
-  //construção do aplicativo - build
   @override
   Widget build(BuildContext context) {
     mudarCor();
@@ -119,16 +100,11 @@ class _EstadoAplicativo extends State<Aplicativo> {
             style: TextStyle(color: Colors.white),
           ),
         ),
-
-        //body - corpo do meu aplicativo
-        //center - centralizar esquerda/direita
         body: Stack(
           children: [
             Center(
-              //column - organizar tudo em colunas - mainAxix centralizar acima/abaixo
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                //representa os filhos do widget column
                 children: [
                   Text(
                     'Contador 1: $contador1',
@@ -160,21 +136,14 @@ class _EstadoAplicativo extends State<Aplicativo> {
             ),
           ],
         ),
-
         floatingActionButton: Row(
-          //define os espaçamentos entre os botões
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Padding(
-              //espaçamento interno ao redor do widget - EdgetInsetsOnly só um lado
               padding: const EdgeInsets.only(left: 60.0),
-              //colocando o botão flutuante
               child: FloatingActionButton(
-                //onPressed: _clique ? (){ setState( (){ contador1++; }); } : null,
                 onPressed: () {
-                  //sinaliza que houve mudança, para atualizar a tela
                   setState(() {
-                    //adicionar +1 na váriavel contador
                     if (_clique == true) {
                       contador1++;
                       movimentar();
